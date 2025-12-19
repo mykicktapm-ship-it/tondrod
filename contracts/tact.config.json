@@ -3,19 +3,19 @@
   "projects": [
     {
       "name": "TonRodyLobby",
-      "path": "../ton-rody/contracts/tact/TonRodyLobby.tact",
+      "path": "./tact/TonRodyLobby.tact",
       "output": "./build",
       "mode": "full"
     },
     {
       "name": "TonRodyCoinFlip",
-      "path": "../ton-rody/contracts/tact/TonRodyCoinFlip.tact",
+      "path": "./tact/TonRodyCoinFlip.tact",
       "output": "./build",
       "mode": "full"
     },
     {
       "name": "TonRodyFactory",
-      "path": "../ton-rody/contracts/tact/TonRodyFactory.tact",
+      "path": "./tact/TonRodyFactory.tact",
       "output": "./build",
       "mode": "full"
     }

@@ -1,12 +1,16 @@
 {
-  "name": "tonrody-monorepo",
+  "name": "ton-rody",
   "private": true,
-  "packageManager": "pnpm@8",
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "9.x"
+  },
   "scripts": {
     "contracts:test": "pnpm -C contracts test",
-    "indexer:dev": "pnpm --filter ton-rody-indexer dev",
-    "web:dev": "pnpm --filter ton-rody-web dev",
-    "api:dev": "pnpm --filter ton-rody-api dev",
-    "dev": "pnpm -r --parallel dev"
+    "indexer:dev": "pnpm --filter ./services/indexer dev",
+    "web:dev": "pnpm --filter ./apps/web dev",
+    "api:dev": "pnpm --filter ./services/api dev",
+    "dev": "pnpm -r --parallel --filter ./apps/web --filter ./services/indexer --filter ./services/api dev"
   }
 }

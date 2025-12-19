@@ -10,7 +10,7 @@ configuration.
 ## Requirements
 
 - **Node.js LTS** (version 20 or newer).
-- [**pnpm**](https://pnpm.io/) package manager (version 8 or newer).  The
+- [**pnpm**](https://pnpm.io/) package manager (version 9.x).  The
   project uses a `pnpm-workspace.yaml` at the monorepo root, but you
   can work on the contracts package in isolation by passing `-C
   contracts` to `pnpm`.
@@ -23,17 +23,17 @@ Install the dependencies once:
 pnpm install
 ```
 
-> The `package.json` pins the versions of **tact**, **ton‑core** and
-> **@ton-community** packages so that contract compilation and tests are
-> reproducible.  Do not update these dependencies without a thorough
-> audit.
+> The `package.json` pins the versions of **tact** (via
+> `@tact-lang/compiler`), **ton?core** and **@ton-community** packages
+> so that contract compilation and tests are reproducible.  Do not update
+> these dependencies without a thorough audit.
 
 ## Building the contracts
 
 Compile the Tact sources into TypeScript wrappers and ABI using:
 
 ```sh
-pnpm -C contracts run build
+pnpm -C contracts build
 ```
 
 The compiled files will be emitted into the `build/` directory.  A

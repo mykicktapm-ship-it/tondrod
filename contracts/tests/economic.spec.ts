@@ -2,7 +2,7 @@
  * Economic invariant tests for TonRodyLobby
  *
  * These tests complement the behavioural tests in `lobby.spec.ts` by
- * asserting global economic properties of the commit–reveal raffle.
+ * asserting global economic properties of the commit-reveal raffle.
  * The invariants tested are:
  *
  * 1. After a game is finalised, the sum of all claimable balances
@@ -18,9 +18,6 @@
 import { Address, beginCell, toNano } from 'ton-core';
 import { Blockchain, SandboxContract } from '@ton-community/sandbox';
 import { expect } from '@ton-community/test-utils';
-import fs from 'fs';
-import path from 'path';
-
 // Import compiled wrapper
 import { TonRodyLobby } from '../build/TonRodyLobby';
 
@@ -40,7 +37,7 @@ function advanceTime(blockchain: Blockchain, seconds: number) {
 describe('economic invariants', () => {
   const stake = toNano('1');
   const maxPlayers = 3;
-  // choose a non‑zero fee to exercise fee logic
+  // choose a non-zero fee to exercise fee logic
   const feeBps = 100; // 1%
 
   let blockchain: Blockchain;

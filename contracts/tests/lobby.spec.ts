@@ -1,8 +1,8 @@
 /*
  * Tests for TonRodyLobby
  *
- * These tests exercise the behaviour of the N‑player lobby raffle
- * contract using the commit–reveal scheme. They use the Blueprint
+ * These tests exercise the behaviour of the N-player lobby raffle
+ * contract using the commit-reveal scheme. They use the Blueprint
  * sandbox environment provided by @ton-community/sandbox. Each test
  * deploys a fresh instance of the contract and simulates players
  * joining, revealing and finalising the game. The scenarios cover
@@ -15,16 +15,16 @@ import { Address, beginCell, toNano } from 'ton-core';
 import { Blockchain, SandboxContract } from '@ton-community/sandbox';
 import { expect } from '@ton-community/test-utils';
 
-// Import the compiled contract wrappers. Blueprint will generate
-// these in the `build` directory when you run `npx blueprint build`.
+// Import the compiled contract wrappers. The Tact compiler generates
+// these in the `build` directory when you run `pnpm build`.
 import { TonRodyLobby } from '../build/TonRodyLobby';
 
 /**
- * Helper to compute a commit off‑chain. The contract defines
+ * Helper to compute a commit off-chain. The contract defines
  * commit = hash(secret || lobbyId || playerAddress). The secret is
  * encoded into a cell and stored as a slice. We then append the
  * lobbyId and the address to the cell before hashing. This helper
- * mirrors the on‑chain computeCommit function.
+ * mirrors the on-chain computeCommit function.
  */
 function computeCommit(secret: Buffer, lobbyId: number, addr: Address): bigint {
   const sc = beginCell();
@@ -74,7 +74,7 @@ describe('TonRodyLobby', () => {
     const joinDeadline = now + joinDuration;
     const revealDeadline = joinDeadline + revealDuration;
     // Use a fixed lobbyId so tests are deterministic.  Changing this value
-    // across tests would affect commit values and cause non‑deterministic
+    // across tests would affect commit values and cause non-deterministic
     // behaviour.  A constant provides stable commits and reproducible
     // results.
     const lobbyId = 12345;
@@ -128,7 +128,7 @@ describe('TonRodyLobby', () => {
     expect(sumClaimable).toBe(totalPot);
   });
 
-  test('auto‑lock when maxPlayers reached', async () => {
+  test('auto-lock when maxPlayers reached', async () => {
     const { lobby, lobbyId } = await deployLobby(10, 10);
     const secrets: Buffer[] = [Buffer.from('s1'), Buffer.from('s2'), Buffer.from('s3')];
     const commits = players.map((p, i) => computeCommit(secrets[i], lobbyId, p.address));
@@ -168,7 +168,7 @@ describe('TonRodyLobby', () => {
     expect(res.exitCode).not.toBeUndefined();
   });
 
-  test('non‑revealed players lose stake', async () => {
+  test('non-revealed players lose stake', async () => {
     const { lobby, lobbyId } = await deployLobby(10, 10);
     // Two players join and commit
     const secrets: Buffer[] = [Buffer.from('sa'), Buffer.from('sb')];
