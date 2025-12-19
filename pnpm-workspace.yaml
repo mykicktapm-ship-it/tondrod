@@ -1,0 +1,5 @@
+packages:
+  - 'contracts'
+  - 'ton-rody/apps/web'
+  - 'ton-rody/services/indexer'
+  - 'ton-rody/services/api'

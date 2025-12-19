@@ -1,0 +1,23 @@
+{
+  "$schema": "http://raw.githubusercontent.com/tact-lang/tact/main/src/config/configSchema.json",
+  "projects": [
+    {
+      "name": "TonRodyLobby",
+      "path": "../ton-rody/contracts/tact/TonRodyLobby.tact",
+      "output": "./build",
+      "mode": "full"
+    },
+    {
+      "name": "TonRodyCoinFlip",
+      "path": "../ton-rody/contracts/tact/TonRodyCoinFlip.tact",
+      "output": "./build",
+      "mode": "full"
+    },
+    {
+      "name": "TonRodyFactory",
+      "path": "../ton-rody/contracts/tact/TonRodyFactory.tact",
+      "output": "./build",
+      "mode": "full"
+    }
+  ]
+}

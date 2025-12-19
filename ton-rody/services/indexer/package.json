@@ -1,0 +1,21 @@
+{
+  "name": "ton-rody-indexer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "fastify": "4.22.2",
+    "pg": "8.11.0",
+    "dotenv": "16.1.0",
+    "@ton/ton": "1.0.0",
+    "@ton/core": "1.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

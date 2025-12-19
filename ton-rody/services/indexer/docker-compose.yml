@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  # TON‑RODY indexer service.  Builds the local TypeScript sources and
+  # runs the compiled indexer with environment variables provided via
+  # the .env file.  Exposes the HTTP API on port 3002.
+  indexer:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/tonrody
+      - TON_RPC_ENDPOINT=https://toncenter.com/api/v2/jsonRPC
+      # Substitute your API key and factory address as needed
+      - TON_API_KEY=
+      - FACTORY_ADDRESS=
+      - PORT=3002
+    depends_on:
+      - db
+    ports:
+      - "3002:3002"
+  # PostgreSQL database for the indexer.  A separate DB service is
+  # provided here for convenience, but you can also use the top‑level
+  # docker‑compose.yml's `db` service.  If you reuse the root DB,
+  # remove this service and update DATABASE_URL accordingly.
+  db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=tonrody
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:

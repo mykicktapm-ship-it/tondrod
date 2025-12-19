@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LobbyState {
+  OPEN
+  LOCKED
+  FINALIZED
+  CANCELED
+}
+
+enum CoinFlipState {
+  OPEN
+  LOCKED
+  FINALIZED
+  CANCELED
+}
+
+enum GameType {
+  LOBBY
+  COINFLIP
+}
+
+enum PayoutKind {
+  FEE
+  WIN
+  REFUND
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  FAILED
+  CLAIMED
+}
+
+enum BlockListType {
+  IP
+  WALLET
+  TELEGRAM
+}
+
+model User {
+  id          String     @id @default(uuid()) @db.Uuid
+  telegramId  BigInt     @unique
+  username    String?
+  createdAt   DateTime   @default(now())
+  lastSeen    DateTime   @default(now())
+
+  walletLink  WalletLink?
+  lobbies     Lobby[]    @relation("LobbyCreator")
+  coinflips   CoinFlip[] @relation("CoinFlipCreator")
+  lobbyParts  LobbyParticipant[]
+  coinParts   CoinFlipParticipant[]
+  auditLogs   AuditLog[]
+
+  @@index([createdAt])
+  @@index([lastSeen])
+}
+
+model WalletLink {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @db.Uuid
+  walletAddress       String   @unique
+  linkedAt            DateTime @default(now())
+  lastChangedAt       DateTime @default(now())
+  relinkCooldownUntil DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([walletAddress])
+  @@index([relinkCooldownUntil])
+}
+
+model Lobby {
+  id              String     @id @default(uuid()) @db.Uuid
+  contractAddress String     @unique
+  version         Int        @default(1)
+
+  stakeNano       BigInt
+  maxPlayers      Int
+  minPlayersToRun Int
+
+  joinDeadline    DateTime
+  revealDeadline  DateTime
+
+  feeBps          Int
+  feeRecipient    String
+
+  state           LobbyState @default(OPEN)
+
+  createdByUserId String     @db.Uuid
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  createdBy       User       @relation("LobbyCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  participants    LobbyParticipant[]
+  payouts         Payout[]
+
+  @@index([state, createdAt])
+  @@index([joinDeadline])
+  @@index([revealDeadline])
+  @@index([createdByUserId])
+}
+
+model LobbyParticipant {
+  id           String   @id @default(uuid()) @db.Uuid
+  lobbyId      String   @db.Uuid
+  userId       String   @db.Uuid
+
+  walletAddress String
+  commitHash    String
+
+  joinedAt      DateTime @default(now())
+  revealedAt    DateTime?
+
+  refunded      Boolean  @default(false)
+
+  joinTxHash    String?  @unique
+  revealTxHash  String?  @unique
+
+  lobbyRel Lobby @relation(fields: [lobbyId], references: [id], onDelete: Cascade)
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([lobbyId, userId])
+  @@index([lobbyId, joinedAt])
+  @@index([userId, joinedAt])
+  @@index([walletAddress])
+  @@index([refunded])
+}
+
+model CoinFlip {
+  id              String       @id @default(uuid()) @db.Uuid
+  contractAddress String       @unique
+  version         Int          @default(1)
+
+  stakeNano       BigInt
+
+  joinDeadline    DateTime
+  revealDeadline  DateTime
+
+  feeBps          Int
+  feeRecipient    String
+
+  state           CoinFlipState @default(OPEN)
+
+  createdByUserId String       @db.Uuid
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  createdBy       User         @relation("CoinFlipCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  participants    CoinFlipParticipant[]
+  payouts         Payout[]
+
+  @@index([state, createdAt])
+  @@index([joinDeadline])
+  @@index([revealDeadline])
+  @@index([createdByUserId])
+}
+
+model CoinFlipParticipant {
+  id            String   @id @default(uuid()) @db.Uuid
+  coinflipId    String   @db.Uuid
+  userId        String   @db.Uuid
+
+  walletAddress String
+  commitHash    String
+
+  joinedAt      DateTime @default(now())
+  revealedAt    DateTime?
+
+  refunded      Boolean  @default(false)
+
+  joinTxHash    String?  @unique
+  revealTxHash  String?  @unique
+
+  coinflip CoinFlip @relation(fields: [coinflipId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([coinflipId, userId])
+  @@index([coinflipId, joinedAt])
+  @@index([userId, joinedAt])
+  @@index([walletAddress])
+  @@index([refunded])
+}
+
+model Payout {
+  id        String      @id @default(uuid()) @db.Uuid
+  gameType  GameType
+  gameId    String      @db.Uuid
+
+  toWallet  String
+  amountNano BigInt
+  kind      PayoutKind
+  status    PayoutStatus @default(PENDING)
+
+  txHash    String?     @unique
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  lobby     Lobby?      @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "payout_lobby_fk")
+  coinflip  CoinFlip?   @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "payout_coinflip_fk")
+
+  @@index([gameType, gameId, status])
+  @@index([toWallet, createdAt])
+  @@index([kind, status])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+
+  action    String
+  ip        String?
+  userAgent String?
+  meta      Json?
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@index([userId, createdAt])
+}
+
+model BlockList {
+  id        String        @id @default(uuid()) @db.Uuid
+  type      BlockListType
+  value     String        @unique
+  reason    String?
+  createdAt DateTime      @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+}

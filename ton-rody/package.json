@@ -1,0 +1,14 @@
+{
+  "name": "ton-rody",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "services/api",
+    "services/indexer"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter apps/web dev & pnpm --filter services/api dev & pnpm --filter services/indexer dev",
+    "build": "pnpm --filter apps/web build && pnpm --filter services/api build && pnpm --filter services/indexer build",
+    "indexer": "pnpm --filter services/indexer dev"
+  }
+}
